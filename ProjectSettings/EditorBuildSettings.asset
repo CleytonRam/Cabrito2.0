@@ -8,4 +8,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Wordle.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/Dueto.unity
+    guid: 8fa196e6b6c62df47b2ac48277869204
+  - enabled: 1
+    path: Assets/Scenes/Quarteto.unity
+    guid: 836be83502f9ced489d8f4e1a7b831a6
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0

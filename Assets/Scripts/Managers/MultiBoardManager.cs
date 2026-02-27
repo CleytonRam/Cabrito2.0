@@ -1,0 +1,194 @@
+using NUnit.Framework;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class MultiBoardManager : MonoBehaviour
+{
+    [Header("Config")]
+    public int maxRows = 6;
+    public int wordLength = 5;
+    public string nextScene = "";
+
+    [Header("Referecences")]
+    public List<Board> boards;
+    public GameObject invalidWordText;
+    public GameObject changeMapButton;
+    private int currentRow = 0;
+    private int currentCol = 0;
+    private bool isGameActive = true;
+
+    private static readonly KeyCode[] SUPPORTED_KEYS = new KeyCode[]
+    {
+        KeyCode.A, KeyCode.B, KeyCode.C, KeyCode.D, KeyCode.E, KeyCode.F,
+        KeyCode.G, KeyCode.H, KeyCode.I, KeyCode.J, KeyCode.K, KeyCode.L,
+        KeyCode.M, KeyCode.N, KeyCode.O, KeyCode.P, KeyCode.Q, KeyCode.R,
+        KeyCode.S, KeyCode.T, KeyCode.U, KeyCode.V, KeyCode.W, KeyCode.X,
+        KeyCode.Y, KeyCode.Z,
+    };
+
+
+    private void Start()
+    {
+        StartNewGame();
+    }
+
+    public void StartNewGame() 
+    {
+        foreach (Board board in boards) 
+        {
+            string secret = board.GetRandomSolutionWord();
+            board.NewGame(secret);
+        }
+
+        for (int i = 0; i < boards.Count; i++)
+        {
+            Debug.Log($"Board {i + 1} palavra secreta: {boards[i].SecretWord}");
+        }
+
+        currentRow = 0;
+        currentCol = 0;
+        isGameActive = true;
+
+        if(invalidWordText) invalidWordText.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (!isGameActive) return;
+
+        if (Input.GetKeyDown(KeyCode.Backspace)) 
+        {
+            HandleBackspace();
+        }
+
+        else if (currentCol >= wordLength) 
+        {
+            if (Input.GetKeyDown(KeyCode.Return)) 
+            {
+                HandleSubmit();
+            }
+        }
+        else
+        {
+            for(int i = 0; i < SUPPORTED_KEYS.Length; i++) 
+            {
+                if (Input.GetKeyDown(SUPPORTED_KEYS[i])) 
+                {
+                    HandleLetter((char)SUPPORTED_KEYS[i]);
+                    break;
+                }
+            }
+        }
+    }
+
+    #region Letter handleling
+    private void HandleLetter(char letter)
+    {
+        if (invalidWordText) invalidWordText.SetActive(false);
+
+        foreach (Board board in boards)
+        {
+            if (!board.HasWon)
+            {
+                board.SetLetter(currentRow, currentCol, letter);
+            }
+        }
+        currentCol++;
+    }
+
+    private void HandleBackspace()
+    {
+        if (invalidWordText) invalidWordText.SetActive(false);
+
+        if (currentCol > 0)
+        {
+            currentCol--;
+            foreach (Board board in boards)
+            {
+                if (!board.HasWon)
+                {
+                    board.SetLetter(currentRow, currentCol, '\0');
+                }
+            }
+        }
+    }
+
+    private void HandleSubmit()
+    {
+        {
+            Board activeBoard = null;
+            foreach (var board in boards)
+            {
+                if (!board.HasWon)
+                {
+                    activeBoard = board;
+                    break;
+                }
+            }
+
+            if (activeBoard == null) return;
+
+            string attempt = activeBoard.GetRowWord(currentRow);
+
+            if (!activeBoard.IsValidWord(attempt))
+            {
+                if (invalidWordText) invalidWordText.SetActive(true);
+                return;
+            }
+            if (invalidWordText) invalidWordText.SetActive(false);
+
+            foreach (Board board in boards)
+            {
+                if (!board.HasWon)
+                {
+                    board.SubmitRow(currentRow);
+                }
+            }
+
+            bool allWon = true;
+
+            foreach (Board board in boards)
+            {
+                if (!board.HasWon)
+                {
+                    allWon = false;
+                    break;
+                }
+            }
+            if (allWon)
+            {
+                Debug.Log("VITORIA TODAS DESCOBERTAS");
+                isGameActive = false;
+                changeMapButton.SetActive(true);
+                return;
+            }
+
+            currentRow++;
+            currentCol = 0;
+
+            if (currentRow >= maxRows)
+            {
+                bool anyLost = false;
+
+                foreach (Board board in boards)
+                {
+                    if (!board.HasWon) anyLost = true;
+                }
+                if (anyLost)
+                {
+                    Debug.Log("DERROTA SEU BURRAO");
+                    isGameActive = false;
+                    changeMapButton.SetActive(true);
+                }
+            }
+        }
+    }
+    #endregion
+
+    public void ChangeScene() 
+    {
+        SceneManager.LoadScene(nextScene);
+    }
+}

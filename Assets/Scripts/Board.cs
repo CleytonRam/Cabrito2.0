@@ -1,26 +1,10 @@
 using UnityEngine;
+using System;
 
 [DefaultExecutionOrder(-1)]
 public class Board : MonoBehaviour
 {
-    private static readonly KeyCode[] SUPPORTED_KEYS = new KeyCode[] {
-        KeyCode.A, KeyCode.B, KeyCode.C, KeyCode.D, KeyCode.E, KeyCode.F,
-        KeyCode.G, KeyCode.H, KeyCode.I, KeyCode.J, KeyCode.K, KeyCode.L,
-        KeyCode.M, KeyCode.N, KeyCode.O, KeyCode.P, KeyCode.Q, KeyCode.R,
-        KeyCode.S, KeyCode.T, KeyCode.U, KeyCode.V, KeyCode.W, KeyCode.X,
-        KeyCode.Y, KeyCode.Z,
-    };
-
-    private static readonly string[] SEPARATOR = new string[] { "\r\n", "\r", "\n" };
-
-    private Row[] rows;
-    private int rowIndex;
-    private int columnIndex;
-
-    private string[] solutions;
-    private string[] validWords;
-    private string word;
-
+    // Estados dos tiles (exatamente como você já tem)
     [Header("Tiles")]
     public Tile.State emptyState;
     public Tile.State occupiedState;
@@ -28,10 +12,11 @@ public class Board : MonoBehaviour
     public Tile.State wrongSpotState;
     public Tile.State incorrectState;
 
-    [Header("UI")]
-    public GameObject tryAgainButton;
-    public GameObject newWordButton;
-    public GameObject invalidWordText;
+    private Row[] rows;
+    private string[] solutions;
+    private string[] validWords;
+    private string word;
+    public bool HasWon { get; private set; }
 
     private void Awake()
     {
@@ -41,90 +26,90 @@ public class Board : MonoBehaviour
     private void Start()
     {
         LoadData();
-        NewGame();
     }
 
     private void LoadData()
     {
         TextAsset textFile = Resources.Load("official_wordle_common") as TextAsset;
-        solutions = textFile.text.Split(SEPARATOR, System.StringSplitOptions.None);
+        solutions = textFile.text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
 
         textFile = Resources.Load("official_wordle_all") as TextAsset;
-        validWords = textFile.text.Split(SEPARATOR, System.StringSplitOptions.None);
+        validWords = textFile.text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
     }
 
-    public void NewGame()
+    // Configura o board com uma nova palavra secreta
+    public void NewGame(string secretWord)
     {
+        word = secretWord.ToLower().Trim();
         ClearBoard();
-        SetRandomWord();
-
-        enabled = true;
+        HasWon = false;
     }
 
-    public void TryAgain()
+    // Define a letra em uma célula específica (linha, coluna)
+    public void SetLetter(int row, int col, char letter)
     {
-        ClearBoard();
-
-        enabled = true;
-    }
-
-    private void SetRandomWord()
-    {
-        word = solutions[Random.Range(0, solutions.Length)];
-        word = word.ToLower().Trim();
-    }
-
-    private void Update()
-    {
-        Row currentRow = rows[rowIndex];
-
-        if (Input.GetKeyDown(KeyCode.Backspace))
+        if (row >= 0 && row < rows.Length && col >= 0 && col < rows[row].tiles.Length)
         {
-            columnIndex = Mathf.Max(columnIndex - 1, 0);
-            currentRow.tiles[columnIndex].SetLetter('\0');
-            currentRow.tiles[columnIndex].SetState(emptyState);
-            invalidWordText.SetActive(false);
+            rows[row].tiles[col].SetLetter(letter);
+            // Não muda o estado aqui – será definido na submissão
         }
-        else if (columnIndex >= currentRow.tiles.Length)
+    }
+
+    // Define o estado de uma célula (usado após submissão)
+    public void SetState(int row, int col, Tile.State state)
+    {
+        if (row >= 0 && row < rows.Length && col >= 0 && col < rows[row].tiles.Length)
         {
-            if (Input.GetKeyDown(KeyCode.Return)) {
-                SubmitRow(currentRow);
-            }
+            rows[row].tiles[col].SetState(state);
         }
-        else
+    }
+
+    // Limpa uma linha inteira
+    public void ClearRow(int row)
+    {
+        if (row >= 0 && row < rows.Length)
         {
-            for (int i = 0; i < SUPPORTED_KEYS.Length; i++)
+            for (int col = 0; col < rows[row].tiles.Length; col++)
             {
-                if (Input.GetKeyDown(SUPPORTED_KEYS[i]))
-                {
-                    currentRow.tiles[columnIndex].SetLetter((char)SUPPORTED_KEYS[i]);
-                    currentRow.tiles[columnIndex].SetState(occupiedState);
-                    columnIndex++;
-                    break;
-                }
+                rows[row].tiles[col].SetLetter('\0');
+                rows[row].tiles[col].SetState(emptyState);
             }
         }
     }
 
-    private void SubmitRow(Row row)
+    public void ClearBoard()
     {
-        if (!IsValidWord(row.word))
-        {
-            invalidWordText.SetActive(true);
-            return;
-        }
+        for (int row = 0; row < rows.Length; row++)
+            ClearRow(row);
+    }
+
+    // Retorna a palavra atual de uma linha (como string)
+    public string GetRowWord(int row)
+    {
+        return rows[row].word;
+    }
+
+    // Submete a tentativa da linha especificada
+    public void SubmitRow(int row)
+    {
+        if (HasWon || row < 0 || row >= rows.Length) return;
+
+        Row currentRow = rows[row];
+        string attempt = currentRow.word;
+
+        if (!IsValidWord(attempt))
+            return; // A validação será feita pelo gerenciador
 
         string remaining = word;
 
-        // Check correct/incorrect letters first
-        for (int i = 0; i < row.tiles.Length; i++)
+        // Passo 1: Letras corretas e incorretas
+        for (int i = 0; i < currentRow.tiles.Length; i++)
         {
-            Tile tile = row.tiles[i];
+            Tile tile = currentRow.tiles[i];
 
             if (tile.letter == word[i])
             {
                 tile.SetState(correctState);
-
                 remaining = remaining.Remove(i, 1);
                 remaining = remaining.Insert(i, " ");
             }
@@ -134,17 +119,16 @@ public class Board : MonoBehaviour
             }
         }
 
-        // Check wrong spots after
-        for (int i = 0; i < row.tiles.Length; i++)
+        // Passo 2: Letras em posição errada
+        for (int i = 0; i < currentRow.tiles.Length; i++)
         {
-            Tile tile = row.tiles[i];
+            Tile tile = currentRow.tiles[i];
 
             if (tile.state != correctState && tile.state != incorrectState)
             {
                 if (remaining.Contains(tile.letter))
                 {
                     tile.SetState(wrongSpotState);
-
                     int index = remaining.IndexOf(tile.letter);
                     remaining = remaining.Remove(index, 1);
                     remaining = remaining.Insert(index, " ");
@@ -156,67 +140,33 @@ public class Board : MonoBehaviour
             }
         }
 
-        if (HasWon(row)) {
-            enabled = false;
-        }
-
-        rowIndex++;
-        columnIndex = 0;
-
-        if (rowIndex >= rows.Length) {
-            enabled = false;
-        }
+        // Verifica se essa linha acertou a palavra
+        if (IsRowCorrect(row))
+            HasWon = true;
     }
 
-    private bool IsValidWord(string word)
+    // Verifica se uma linha específica está completamente correta
+    public bool IsRowCorrect(int row)
     {
-        for (int i = 0; i < validWords.Length; i++)
-        {
-            if (string.Equals(word, validWords[i], System.StringComparison.OrdinalIgnoreCase)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private bool HasWon(Row row)
-    {
-        for (int i = 0; i < row.tiles.Length; i++)
-        {
-            if (row.tiles[i].state != correctState) {
-                return false;
-            }
-        }
-
+        if (row < 0 || row >= rows.Length) return false;
+        foreach (var tile in rows[row].tiles)
+            if (tile.state != correctState) return false;
         return true;
     }
 
-    private void ClearBoard()
+    // Valida se uma palavra existe no dicionário
+    public bool IsValidWord(string word)
     {
-        for (int row = 0; row < rows.Length; row++)
-        {
-            for (int col = 0; col < rows[row].tiles.Length; col++)
-            {
-                rows[row].tiles[col].SetLetter('\0');
-                rows[row].tiles[col].SetState(emptyState);
-            }
-        }
-
-        rowIndex = 0;
-        columnIndex = 0;
+        for (int i = 0; i < validWords.Length; i++)
+            if (string.Equals(word, validWords[i], StringComparison.OrdinalIgnoreCase))
+                return true;
+        return false;
     }
 
-    private void OnEnable()
+    // Retorna uma palavra secreta aleatória (útil para o gerenciador)
+    public string GetRandomSolutionWord()
     {
-        tryAgainButton.SetActive(false);
-        newWordButton.SetActive(false);
+        return solutions[UnityEngine.Random.Range(0, solutions.Length)].ToLower().Trim();
     }
-
-    private void OnDisable()
-    {
-        tryAgainButton.SetActive(true);
-        newWordButton.SetActive(true);
-    }
-
+    public string SecretWord => word;
 }
