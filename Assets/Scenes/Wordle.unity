@@ -247,6 +247,7 @@ MonoBehaviour:
   - {fileID: 1891888964}
   invalidWordText: {fileID: 1962657229}
   changeMapButton: {fileID: 848574269}
+  backToMapButton: {fileID: 799967939}
 --- !u!4 &592711777
 Transform:
   m_ObjectHideFlags: 0
@@ -425,7 +426,7 @@ GameObject:
   - component: {fileID: 799967944}
   - component: {fileID: 799967941}
   m_Layer: 5
-  m_Name: Try Again Button
+  m_Name: ReturnToMapButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -448,7 +449,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: -282.00003, y: 100}
+  m_AnchoredPosition: {x: -896, y: 966}
   m_SizeDelta: {x: 274, y: 60}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &799967941
@@ -495,9 +496,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1891888964}
-        m_TargetAssemblyTypeName: Board, Assembly-CSharp
-        m_MethodName: TryAgain
+      - m_Target: {fileID: 592711776}
+        m_TargetAssemblyTypeName: MultiBoardManager, Assembly-CSharp
+        m_MethodName: ReturnToMap
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -903,7 +904,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Try Again
+  m_text: Return to map
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 28797041885d6a44785cefd022ac08fe, type: 2}
   m_sharedMaterial: {fileID: 1360115715842635606, guid: 28797041885d6a44785cefd022ac08fe, type: 2}
@@ -953,7 +954,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1

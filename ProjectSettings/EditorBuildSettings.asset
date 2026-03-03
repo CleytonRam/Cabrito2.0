@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Map.unity
+    guid: 832678c003a718f448d228f458628a36
+  - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: 774658abc17ea054c8a710e33ee3870c
+  - enabled: 1
     path: Assets/Scenes/Wordle.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1

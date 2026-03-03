@@ -15,6 +15,9 @@ public class MultiBoardManager : MonoBehaviour
     public List<Board> boards;
     public GameObject invalidWordText;
     public GameObject changeMapButton;
+    public GameObject backToMapButton;
+
+
     private int currentRow = 0;
     private int currentCol = 0;
     private bool isGameActive = true;
@@ -34,9 +37,9 @@ public class MultiBoardManager : MonoBehaviour
         StartNewGame();
     }
 
-    public void StartNewGame() 
+    public void StartNewGame()
     {
-        foreach (Board board in boards) 
+        foreach (Board board in boards)
         {
             string secret = board.GetRandomSolutionWord();
             board.NewGame(secret);
@@ -51,30 +54,31 @@ public class MultiBoardManager : MonoBehaviour
         currentCol = 0;
         isGameActive = true;
 
-        if(invalidWordText) invalidWordText.SetActive(false);
+        if (invalidWordText) invalidWordText.SetActive(false);
+        if (changeMapButton) changeMapButton.SetActive(false);
     }
 
     private void Update()
     {
         if (!isGameActive) return;
 
-        if (Input.GetKeyDown(KeyCode.Backspace)) 
+        if (Input.GetKeyDown(KeyCode.Backspace))
         {
             HandleBackspace();
         }
 
-        else if (currentCol >= wordLength) 
+        else if (currentCol >= wordLength)
         {
-            if (Input.GetKeyDown(KeyCode.Return)) 
+            if (Input.GetKeyDown(KeyCode.Return))
             {
                 HandleSubmit();
             }
         }
         else
         {
-            for(int i = 0; i < SUPPORTED_KEYS.Length; i++) 
+            for (int i = 0; i < SUPPORTED_KEYS.Length; i++)
             {
-                if (Input.GetKeyDown(SUPPORTED_KEYS[i])) 
+                if (Input.GetKeyDown(SUPPORTED_KEYS[i]))
                 {
                     HandleLetter((char)SUPPORTED_KEYS[i]);
                     break;
@@ -117,78 +121,99 @@ public class MultiBoardManager : MonoBehaviour
 
     private void HandleSubmit()
     {
+        Board activeBoard = null;
+        foreach (var board in boards)
         {
-            Board activeBoard = null;
-            foreach (var board in boards)
+            if (!board.HasWon)
             {
-                if (!board.HasWon)
-                {
-                    activeBoard = board;
-                    break;
-                }
+                activeBoard = board;
+                break;
             }
+        }
 
-            if (activeBoard == null) return;
+        if (activeBoard == null) return;
 
-            string attempt = activeBoard.GetRowWord(currentRow);
+        string attempt = activeBoard.GetRowWord(currentRow);
 
-            if (!activeBoard.IsValidWord(attempt))
+        if (!activeBoard.IsValidWord(attempt))
+        {
+            if (invalidWordText) invalidWordText.SetActive(true);
+            return;
+        }
+        if (invalidWordText) invalidWordText.SetActive(false);
+
+        foreach (Board board in boards)
+        {
+            if (!board.HasWon)
             {
-                if (invalidWordText) invalidWordText.SetActive(true);
-                return;
+                board.SubmitRow(currentRow);
             }
-            if (invalidWordText) invalidWordText.SetActive(false);
+        }
 
+        bool allWon = true;
+        foreach (Board board in boards)
+        {
+            if (!board.HasWon)
+            {
+                allWon = false;
+                break;
+            }
+        }
+
+        if (allWon)
+        {
+            Debug.Log("VITORIA TODAS DESCOBERTAS");
+            isGameActive = false;
+            changeMapButton.SetActive(true);
+            backToMapButton.SetActive(true);
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnNodeComplete(true);
+            }
+            return;
+        }
+
+        currentRow++;
+        currentCol = 0;
+
+        if (currentRow >= maxRows)
+        {
+            bool anyLost = false;
             foreach (Board board in boards)
             {
-                if (!board.HasWon)
-                {
-                    board.SubmitRow(currentRow);
-                }
+                if (!board.HasWon) anyLost = true;
             }
-
-            bool allWon = true;
-
-            foreach (Board board in boards)
+            if (anyLost)
             {
-                if (!board.HasWon)
-                {
-                    allWon = false;
-                    break;
-                }
-            }
-            if (allWon)
-            {
-                Debug.Log("VITORIA TODAS DESCOBERTAS");
+                Debug.Log("DERROTA SEU BURRAO");
                 isGameActive = false;
                 changeMapButton.SetActive(true);
-                return;
-            }
+                backToMapButton.SetActive(true);
 
-            currentRow++;
-            currentCol = 0;
-
-            if (currentRow >= maxRows)
-            {
-                bool anyLost = false;
-
-                foreach (Board board in boards)
+                if (GameManager.Instance != null)
                 {
-                    if (!board.HasWon) anyLost = true;
-                }
-                if (anyLost)
-                {
-                    Debug.Log("DERROTA SEU BURRAO");
-                    isGameActive = false;
-                    changeMapButton.SetActive(true);
+                    GameManager.Instance.OnNodeComplete(false);
                 }
             }
         }
     }
     #endregion
 
-    public void ChangeScene() 
+    public void ChangeScene()
     {
         SceneManager.LoadScene(nextScene);
+    }
+
+    public void ReturnToMap()
+    {
+        if (GameManager.Instance != null) // se existe instância
+        {
+            SceneManager.LoadScene(GameManager.Instance.mapScene);
+        }
+        else
+        {
+            SceneManager.LoadScene(nextScene);
+        }
     }
 }
