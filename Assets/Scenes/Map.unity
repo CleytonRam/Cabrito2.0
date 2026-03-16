@@ -422,6 +422,7 @@ RectTransform:
   - {fileID: 1445438380}
   - {fileID: 2068061367}
   - {fileID: 399334349}
+  - {fileID: 1727310712}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -511,6 +512,7 @@ MonoBehaviour:
   currentFloor: 0
   maxFloors: 3
   coins: 0
+  startingHealth: 3
   currentNode:
     nodeType: 0
     position: {x: 0, y: 0}
@@ -568,7 +570,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -768.0369, y: 469.73596}
+  m_AnchoredPosition: {x: -768.0369, y: 371}
   m_SizeDelta: {x: 285.9261, y: 42.5281}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1445438381
@@ -763,6 +765,86 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1727310711
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1727310712}
+  - component: {fileID: 1727310714}
+  - component: {fileID: 1727310713}
+  m_Layer: 5
+  m_Name: HeartsContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1727310712
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1727310711}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 947361891}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -865, y: 464}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1727310713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1727310711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627462eacb7a4ed4e8fdb08b2d851c65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  heartPrefab: {fileID: 3011412365367523332, guid: f60a3477d4784334b9e92778b26e6a9d, type: 3}
+  heartsContainer: {fileID: 1727310712}
+  fullHeartSprite: {fileID: -1752631484113238973, guid: 1588f5a5374d8cc4fa2ce273b6e82a5a, type: 3}
+  emptyHeartSprite: {fileID: -8931384556100219585, guid: 001b2b93aa54f594eb4de1671b75c402, type: 3}
+  halfHeartSprite: {fileID: -1752631484113238973, guid: 1588f5a5374d8cc4fa2ce273b6e82a5a, type: 3}
+--- !u!114 &1727310714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1727310711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 3
+  m_Spacing: 32.76
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &2068061366
 GameObject:
   m_ObjectHideFlags: 0
@@ -797,7 +879,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 845, y: 471}
+  m_AnchoredPosition: {x: 845, y: 461}
   m_SizeDelta: {x: 187.1429, y: 42.524}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2068061368

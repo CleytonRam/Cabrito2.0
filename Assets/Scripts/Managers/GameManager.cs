@@ -11,6 +11,11 @@ public class GameManager : Singleton<GameManager>
     public int coins = 0;
     public List<Item> items = new List<Item>();
 
+    [Header("Health System")]
+    [SerializeField] private int startingHealth = 3;
+    private HealthSystem healthSystem;
+    public HealthSystem Health => healthSystem;
+
     [Header("Current Node")]
     public MapNode currentNode;
 
@@ -25,6 +30,19 @@ public class GameManager : Singleton<GameManager>
     {
         base.Awake();
         DontDestroyOnLoad(gameObject);
+
+        healthSystem = new HealthSystem(startingHealth);
+        healthSystem.OnDeath += OnPlayerDeath;
+        healthSystem.OnHealthChanged += OnHealthChanged;
+    }
+
+    private void OnDestroy()
+    {
+        if (healthSystem != null)
+        {
+            healthSystem.OnDeath -= OnPlayerDeath;
+            healthSystem.OnHealthChanged -= OnHealthChanged;
+        }
     }
 
     public void StartNewRun()
@@ -32,7 +50,12 @@ public class GameManager : Singleton<GameManager>
         currentFloor = 0;
         coins = 0;
         items.Clear();
-        savedFloorNodes.Clear(); // Limpa qualquer estado salvo anterior
+        savedFloorNodes.Clear();
+
+        healthSystem = new HealthSystem(startingHealth);
+        healthSystem.OnDeath += OnPlayerDeath;
+        healthSystem.OnHealthChanged += OnHealthChanged;
+
         SceneManager.LoadScene(mapScene);
     }
 
@@ -40,14 +63,12 @@ public class GameManager : Singleton<GameManager>
     {
         currentNode = node;
 
-        // Salva o estado atual do andar antes de sair
         MapGenerator mapGen = FindObjectOfType<MapGenerator>();
         if (mapGen != null)
         {
             savedFloorNodes = mapGen.GetCurrentFloorNodes();
         }
 
-        // Carrega a cena de jogo baseada no tipo do nó
         switch (node.nodeType)
         {
             case NodeType.Normal:
@@ -66,7 +87,7 @@ public class GameManager : Singleton<GameManager>
                 SceneManager.LoadScene("Shop");
                 break;
             case NodeType.Boss:
-                SceneManager.LoadScene("Wordle"); // por enquanto, Wordle normal
+                SceneManager.LoadScene("Wordle");
                 break;
             default:
                 SceneManager.LoadScene("Wordle");
@@ -81,17 +102,14 @@ public class GameManager : Singleton<GameManager>
             coins += Random.Range(2, 12);
             Debug.Log($"Ganhou a rodada! Moedas: {coins}");
 
-            // Se era um boss, avançar andar
             if (currentNode != null && currentNode.nodeType == NodeType.Boss)
             {
                 AdvanceToNextFloor();
             }
             else
             {
-                // --- NOVO: Libera o próximo nó no estado salvo ---
                 if (savedFloorNodes != null && savedFloorNodes.Count > 0 && currentNode != null)
                 {
-                    // Encontra o índice do nó que acabamos de vencer
                     int currentIndex = -1;
                     for (int i = 0; i < savedFloorNodes.Count; i++)
                     {
@@ -103,17 +121,14 @@ public class GameManager : Singleton<GameManager>
                         }
                     }
 
-                    // Se encontrou e não é o último, libera o próximo
                     if (currentIndex >= 0 && currentIndex < savedFloorNodes.Count - 1)
                     {
                         savedFloorNodes[currentIndex].isVisited = true;
                         savedFloorNodes[currentIndex + 1].isAvailable = true;
-                        Debug.Log($"Liberou nó {currentIndex + 2} (índice {currentIndex + 1})");
+                        Debug.Log($"Liberou nó {currentIndex + 2}");
                     }
                 }
-                // ------------------------------------------------
 
-                // Volta ao mapa - o MapGenerator vai restaurar o estado salvo
                 SceneManager.LoadScene(mapScene);
             }
 
@@ -125,6 +140,14 @@ public class GameManager : Singleton<GameManager>
         else
         {
             Debug.Log("Perdeu a rodada");
+            RemoveHealth(1);
+
+            if (Health.isDead)
+            {
+                Debug.Log("Jogador morreu, não carregar mapa");
+                return; 
+            }
+
             SceneManager.LoadScene(mapScene);
         }
     }
@@ -134,14 +157,12 @@ public class GameManager : Singleton<GameManager>
         currentFloor++;
         if (currentFloor < maxFloors)
         {
-            // Limpa o estado salvo (novo andar = novo estado)
             savedFloorNodes.Clear();
             SceneManager.LoadScene(mapScene);
         }
         else
         {
-            // Vitória da run!
-            Debug.Log("Parabéns! Vocę completou todos os andares!");
+            Debug.Log("Parabéns! Você completou todos os andares!");
             ReturnToMenu();
         }
     }
@@ -151,9 +172,49 @@ public class GameManager : Singleton<GameManager>
         SceneManager.LoadScene(menuScene);
     }
 
-    // Método para o MapGenerator pegar o estado salvo
     public List<MapNode> GetSavedFloorNodes()
     {
         return savedFloorNodes;
     }
+
+    #region ========== MÉTODOS DO SISTEMA DE VIDA ==========
+
+    public void AddHealth(int amount)
+    {
+        if (healthSystem != null)
+            healthSystem.Heal(amount);
+    }
+
+    public void RemoveHealth(int amount)
+    {
+        Debug.Log($"RemoveHealth chamado com amount={amount}");
+        if (healthSystem != null)
+            healthSystem.TakeDamage(amount);
+        else
+            Debug.LogError("healthSystem é nulo!");
+    }
+
+    public void AddMaxHealth(int amount, bool healToo = true)
+    {
+        if (healthSystem != null)
+            healthSystem.AddMaxHealth(amount, healToo);
+    }
+
+    private void OnPlayerDeath()
+    {
+        Debug.Log("GAME OVER! Você morreu!");
+        ReturnToMenu();
+    }
+
+    private void OnHealthChanged(int current, int max)
+    {
+        Debug.Log($"Vida: {current}/{max}");
+
+        HealthUI healthUI = FindObjectOfType<HealthUI>();
+        if (healthUI != null)
+        {
+            healthUI.UpdateHearts(current, max);
+        }
+    }
+    #endregion
 }
