@@ -11,6 +11,15 @@ public class GameManager : Singleton<GameManager>
     public int coins = 0;
     public List<Item> items = new List<Item>();
 
+    [Header("Inventory")]
+    public List<ItemData> ownedItems = new List<ItemData>();
+    public List<ItemData> purchasedUniqueItems = new List<ItemData>();
+    private Dictionary<ItemData, int> activeItemCooldowns = new Dictionary<ItemData, int>();
+
+    [Header("Active Item")]
+    public ItemData activeItem;
+    private int activeItemCooldown = 0;
+
     [Header("Health System")]
     [SerializeField] private int startingHealth = 3;
     private HealthSystem healthSystem;
@@ -51,6 +60,8 @@ public class GameManager : Singleton<GameManager>
         coins = 0;
         items.Clear();
         savedFloorNodes.Clear();
+        ownedItems.Clear();
+        purchasedUniqueItems.Clear();
 
         healthSystem = new HealthSystem(startingHealth);
         healthSystem.OnDeath += OnPlayerDeath;
@@ -128,7 +139,7 @@ public class GameManager : Singleton<GameManager>
                         Debug.Log($"Liberou nó {currentIndex + 2}");
                     }
                 }
-
+                ReduceActiveItemCooldown();
                 SceneManager.LoadScene(mapScene);
             }
 
@@ -214,6 +225,101 @@ public class GameManager : Singleton<GameManager>
         if (healthUI != null)
         {
             healthUI.UpdateHearts(current, max);
+        }
+    }
+    #endregion
+
+    #region ITEM MANAGMENT
+    public void AddItem(ItemData item)
+    {
+        if (item.isActive)
+        {
+            // Se já existe um item ativo, descarta o antigo
+            if (activeItem != null)
+            {
+                Debug.Log($"Substituindo item ativo: {activeItem.itemName} → {item.itemName}");
+                // Remove o antigo da lista de itens (se você quiser que ele suma completamente)
+                ownedItems.Remove(activeItem);
+            }
+
+            // Configura o novo item ativo
+            activeItem = item;
+            activeItemCooldown = 0;
+            ownedItems.Add(item); // Adiciona à lista geral (opcional, mas útil para debug)
+
+            // Notifica a UI para atualizar o ícone do item ativo
+            UpdateActiveItemUI();
+        }
+        else
+        {
+            // Item passivo: adiciona normalmente
+            ownedItems.Add(item);
+            Debug.Log($"Item passivo adicionado: {item.itemName}");
+        }
+    }
+
+    //public void OnNodeCompletedForCooldown()
+    //{
+    //    List<ItemData> itemsToUpdate = new List<ItemData>(activeItemCooldowns.Keys);
+    //    foreach (var item in itemsToUpdate)
+    //    {
+    //        if (activeItemCooldowns[item] > 0)
+    //        {
+    //            activeItemCooldowns[item]--;
+    //        }
+    //    }
+    //}
+    public bool TryUseActiveItem()
+    {
+        if (activeItem != null && activeItemCooldown == 0)
+        {
+            Debug.Log($"Usando item ativo: {activeItem.itemName}");
+            activeItem.ApplyEffect(); // O efeito específico será implementado em cada item
+            activeItemCooldown = activeItem.cooldownNodes;
+
+            // Atualiza a UI para mostrar o cooldown
+            UpdateActiveItemUI();
+            return true;
+        }
+        else if (activeItem != null && activeItemCooldown > 0)
+        {
+            Debug.Log($"Item ativo em cooldown: {activeItemCooldown} nós restantes");
+            return false;
+        }
+        else
+        {
+            Debug.Log("Nenhum item ativo para usar");
+            return false;
+        }
+    }
+    public void ReduceActiveItemCooldown()
+    {
+        if (activeItem != null && activeItemCooldown > 0)
+        {
+            activeItemCooldown--;
+            Debug.Log($"Cooldown do item ativo: {activeItemCooldown} restantes");
+            UpdateActiveItemUI();
+        }
+    }
+    private void UpdateActiveItemUI()
+    {
+        ActiveItemUI ui = FindObjectOfType<ActiveItemUI>();
+        if (ui != null)
+        {
+            ui.UpdateDisplay(activeItem, activeItemCooldown);
+        }
+    }
+    public bool IsItemPurchased(ItemData item) 
+    {
+        return purchasedUniqueItems.Contains(item); 
+    }
+
+    public void MarkItemAsPurchased(ItemData item) 
+    {
+        if(item.isUnique && !purchasedUniqueItems.Contains(item)) 
+        {
+            purchasedUniqueItems.Add(item);
+            Debug.Log($"Item único marcado como comprado: {item.itemName}");
         }
     }
     #endregion

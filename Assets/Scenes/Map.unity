@@ -459,7 +459,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e14674bce81498469a71ddf1daa83b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nodesPerFloor: 5
+  nodesPerFloor: 6
   horizontalSpacing: 200
   nodeButtonPrefab: {fileID: 7414014158096408213, guid: 9f6b6e48031f44744aef153b9abe7019, type: 3}
   nodesContainer: {fileID: 399334349}
@@ -512,6 +512,7 @@ MonoBehaviour:
   currentFloor: 0
   maxFloors: 3
   coins: 0
+  ownedItems: []
   startingHealth: 3
   currentNode:
     nodeType: 0

@@ -52,6 +52,17 @@ public class MapGenerator : MonoBehaviour
         nodeButtons.Clear();
         currentFloorNodes.Clear();
 
+
+        bool hasShopThisFloor = (floorIndex >= 1);
+
+
+        int shopPosition = -1;
+        if (hasShopThisFloor)
+        {
+            // Escolhe uma posição aleatória para a loja (0 a nodesPerFloor-2, para não ser o boss)
+            shopPosition = Random.Range(0, nodesPerFloor - 1);
+        }
+
         // Gera os nós do andar
         for (int i = 0; i < nodesPerFloor; i++)
         {
@@ -59,15 +70,22 @@ public class MapGenerator : MonoBehaviour
 
             // Último nó é sempre boss
             if (i == nodesPerFloor - 1)
+            {
                 type = NodeType.Boss;
+            }
+            // Se esta posição é a da loja
+            else if (i == shopPosition)
+            {
+                type = NodeType.Shop;
+            }
             else
+            {
                 type = GetRandomNodeType(floorIndex);
+            }
 
             MapNode node = new MapNode(type, new Vector2(i, floorIndex));
 
-            // Lógica de disponibilidade:
-            // - Primeiro nó (índice 0) sempre disponível
-            // - Demais nós começam indisponíveis
+            // Lógica de disponibilidade
             node.isAvailable = (i == 0);
             node.isVisited = false;
 
@@ -94,11 +112,11 @@ public class MapGenerator : MonoBehaviour
 
     private NodeType GetRandomNodeType(int floorIndex)
     {
-        // Distribuição simples
         float r = Random.value;
         if (r < 0.5f) return NodeType.Normal;
         else if (r < 0.8f) return NodeType.Dueto;
         else return NodeType.Quarteto;
+
     }
 
     private void CreateNodeButton(MapNode node, int floor, int index)

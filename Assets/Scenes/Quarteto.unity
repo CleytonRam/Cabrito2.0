@@ -175,7 +175,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.07058824, g: 0.07058824, b: 0.07450981, a: 1}
+  m_BackGroundColor: {r: 0.2264151, g: 0.08030734, b: 0.016019935, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1952,6 +1952,30 @@ PrefabInstance:
       propertyPath: invalidWordText
       value: 
       objectReference: {fileID: 1962657229}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: emptyState.fillColor.b
+      value: 0.32941177
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: emptyState.fillColor.g
+      value: 0.48235297
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: emptyState.fillColor.r
+      value: 0.8117648
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: occupiedState.fillColor.b
+      value: 0.32941177
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: occupiedState.fillColor.g
+      value: 0.48235297
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: occupiedState.fillColor.r
+      value: 0.8117648
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -2678,6 +2702,30 @@ PrefabInstance:
       propertyPath: invalidWordText
       value: 
       objectReference: {fileID: 1962657229}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: emptyState.fillColor.b
+      value: 0.32941177
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: emptyState.fillColor.g
+      value: 0.48235297
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: emptyState.fillColor.r
+      value: 0.8117648
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: occupiedState.fillColor.b
+      value: 0.32941177
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: occupiedState.fillColor.g
+      value: 0.48235297
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: occupiedState.fillColor.r
+      value: 0.8117648
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -4233,6 +4281,30 @@ PrefabInstance:
       propertyPath: invalidWordText
       value: 
       objectReference: {fileID: 1962657229}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: emptyState.fillColor.b
+      value: 0.32941177
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: emptyState.fillColor.g
+      value: 0.48235297
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: emptyState.fillColor.r
+      value: 0.8117648
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: occupiedState.fillColor.b
+      value: 0.32941177
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: occupiedState.fillColor.g
+      value: 0.48235297
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: occupiedState.fillColor.r
+      value: 0.8117648
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -6449,6 +6521,30 @@ PrefabInstance:
       propertyPath: invalidWordText
       value: 
       objectReference: {fileID: 1962657229}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: emptyState.fillColor.b
+      value: 0.32941177
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: emptyState.fillColor.g
+      value: 0.48235297
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: emptyState.fillColor.r
+      value: 0.8117648
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: occupiedState.fillColor.b
+      value: 0.32941177
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: occupiedState.fillColor.g
+      value: 0.48235297
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568301093707434397, guid: c30b52524b8f06043b92606ee799cb23, type: 3}
+      propertyPath: occupiedState.fillColor.r
+      value: 0.8117648
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

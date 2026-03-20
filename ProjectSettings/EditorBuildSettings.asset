@@ -20,5 +20,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Quarteto.unity
     guid: 836be83502f9ced489d8f4e1a7b831a6
+  - enabled: 1
+    path: Assets/Scenes/Shop.unity
+    guid: 6e42ef81ee27325428c7725a962c17e5
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
