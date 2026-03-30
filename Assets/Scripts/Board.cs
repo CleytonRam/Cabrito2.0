@@ -1,5 +1,9 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Random = UnityEngine.Random;
+
 
 [DefaultExecutionOrder(-1)]
 public class Board : MonoBehaviour
@@ -11,6 +15,7 @@ public class Board : MonoBehaviour
     public Tile.State correctState;
     public Tile.State wrongSpotState;
     public Tile.State incorrectState;
+    
 
     private Row[] rows;
     private string[] solutions;
@@ -169,4 +174,53 @@ public class Board : MonoBehaviour
         return solutions[UnityEngine.Random.Range(0, solutions.Length)].ToLower().Trim();
     }
     public string SecretWord => word;
+    public void RevealRandomLetter()
+    {
+        // Se já venceu, não faz nada
+        if (HasWon) return;
+
+        // Encontra a primeira linha vazia (a primeira tentativa)
+        int firstEmptyRow = -1;
+        for (int i = 0; i < rows.Length; i++)
+        {
+            string rowWord = GetRowWord(i);
+            if (string.IsNullOrEmpty(rowWord) || rowWord.Trim() == "" || rowWord.All(c => c == '\0'))
+            {
+                firstEmptyRow = i;
+                break;
+            }
+        }
+
+        if (firstEmptyRow == -1) return; // não tem linha vazia
+
+        // Verifica quais posições ainda não estão preenchidas
+        List<int> availablePositions = new List<int>();
+        for (int i = 0; i < word.Length; i++)
+        {
+            if (GetLetterAt(firstEmptyRow, i) == '\0')
+            {
+                availablePositions.Add(i);
+            }
+        }
+
+        if (availablePositions.Count == 0) return;
+
+        // Escolhe uma posição aleatória
+        int position = availablePositions[Random.Range(0, availablePositions.Count)];
+
+        // Coloca a letra correta nessa posição
+        char correctLetter = word[position];
+        SetLetter(firstEmptyRow, position, correctLetter);
+        SetState(firstEmptyRow, position, occupiedState);
+
+        Debug.Log($"Caneta Favorita revelou '{correctLetter}' na posição {position + 1} da palavra '{word}'");
+    }
+    public char GetLetterAt(int row, int col)
+    {
+        if (row >= 0 && row < rows.Length && col >= 0 && col < rows[row].tiles.Length)
+        {
+            return rows[row].tiles[col].letter;
+        }
+        return '\0';
+    }
 }

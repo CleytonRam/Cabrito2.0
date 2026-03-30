@@ -21,6 +21,8 @@ public class MultiBoardManager : MonoBehaviour
     private int currentRow = 0;
     private int currentCol = 0;
     private bool isGameActive = true;
+    private bool usedActiveItemInThisNode = false;
+
 
     private static readonly KeyCode[] SUPPORTED_KEYS = new KeyCode[]
     {
@@ -50,9 +52,16 @@ public class MultiBoardManager : MonoBehaviour
             Debug.Log($"Board {i + 1} palavra secreta: {boards[i].SecretWord}");
         }
 
+        foreach(ItemData item in GameManager.Instance.ownedItems) 
+        {
+            item.ApplyEffect();
+        }
+
+
         currentRow = 0;
         currentCol = 0;
         isGameActive = true;
+        usedActiveItemInThisNode = false;
 
         if (invalidWordText) invalidWordText.SetActive(false);
         if (changeMapButton) changeMapButton.SetActive(false);
@@ -61,6 +70,13 @@ public class MultiBoardManager : MonoBehaviour
     private void Update()
     {
         if (!isGameActive) return;
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (!usedActiveItemInThisNode && GameManager.Instance.TryUseActiveItem())
+            {
+                usedActiveItemInThisNode = true;
+            }
+        }
 
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
@@ -198,6 +214,33 @@ public class MultiBoardManager : MonoBehaviour
             }
         }
     }
+    #endregion
+
+
+    #region Item things
+    
+    public void UndoLastAttempt() 
+    {
+        if(currentRow <= 0) 
+        {
+            Debug.Log("Sem tentativa para apagar");
+            return;
+        }
+
+        currentRow--;
+        currentCol = 0;
+
+        foreach (Board board in boards) 
+        {
+            if (!board.HasWon) 
+            {
+                board.ClearRow(currentRow);
+            }
+        }
+        Debug.Log($"Última tentativa (linha {currentRow + 1}) apagada dos boards que não venceram!");
+    }
+
+
     #endregion
 
     public void ChangeScene()

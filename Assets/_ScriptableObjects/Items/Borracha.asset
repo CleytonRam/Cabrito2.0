@@ -9,11 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 327b613732467644a8f96eeac388c391, type: 3}
+  m_Script: {fileID: 11500000, guid: 94381b4036acd9745a07ba0ff79c93aa, type: 3}
   m_Name: Borracha
   m_EditorClassIdentifier: 
-  itemName: Borracha apaga tudo
+  itemName: Borracha
   description: Apague seus erros
   icon: {fileID: 2436738296648461087, guid: 725c52de7ccbf4c43943610e82126413, type: 3}
-  price: 10
+  price: 20
   rarity: 0
+  isUnique: 0
+  isActive: 1
+  cooldownNodes: 2

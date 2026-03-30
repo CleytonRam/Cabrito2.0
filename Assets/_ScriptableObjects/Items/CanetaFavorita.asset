@@ -9,11 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 327b613732467644a8f96eeac388c391, type: 3}
+  m_Script: {fileID: 11500000, guid: 42f0480b57e93ca45bc92f8beb7e5641, type: 3}
   m_Name: CanetaFavorita
   m_EditorClassIdentifier: 
-  itemName: Caneta favorita
-  description: +1 tentativa
+  itemName: Caneta Favorita
+  description: 'Toda mordida '
   icon: {fileID: -8900572590507102834, guid: a464d0edcc64a254eb41d9a66637c066, type: 3}
-  price: 16
-  rarity: 1
+  price: 10
+  rarity: 0
+  isUnique: 0
+  isActive: 0
+  cooldownNodes: 2

@@ -1133,11 +1133,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemSlots: 4
-  slotPositions:
-  - {fileID: 940351928}
-  - {fileID: 1450989148}
-  - {fileID: 669390990}
-  - {fileID: 1132870417}
   commonItems:
   - {fileID: 11400000, guid: 6d868f4ada7372941833ee5faa5b1afe, type: 2}
   - {fileID: 11400000, guid: 6d868f4ada7372941833ee5faa5b1afe, type: 2}
@@ -1162,6 +1157,11 @@ MonoBehaviour:
   uncommonChance: 25
   rareChance: 10
   legendaryChance: 5
+  slotPositions:
+  - {fileID: 940351928}
+  - {fileID: 1450989148}
+  - {fileID: 669390990}
+  - {fileID: 1132870417}
   shopSlotPrefab: {fileID: 1830598354272836478, guid: 2b4633ecb907c344d89e33173d83cc0f, type: 3}
   slotsContainer: {fileID: 1406951819}
   coinsText: {fileID: 403251612}

@@ -6,11 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Map.unity
-    guid: 832678c003a718f448d228f458628a36
-  - enabled: 1
     path: Assets/Scenes/Menu.unity
     guid: 774658abc17ea054c8a710e33ee3870c
+  - enabled: 1
+    path: Assets/Scenes/Map.unity
+    guid: 832678c003a718f448d228f458628a36
   - enabled: 1
     path: Assets/Scenes/Wordle.unity
     guid: 2cda990e2423bbf4892e6590ba056729
@@ -23,5 +23,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Shop.unity
     guid: 6e42ef81ee27325428c7725a962c17e5
+  - enabled: 1
+    path: Assets/Scenes/Event.unity
+    guid: fb269ccf6c01ab84aafee017461c6e00
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

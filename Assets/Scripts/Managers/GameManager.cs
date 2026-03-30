@@ -14,15 +14,12 @@ public class GameManager : Singleton<GameManager>
     [Header("Inventory")]
     public List<ItemData> ownedItems = new List<ItemData>();
     public List<ItemData> purchasedUniqueItems = new List<ItemData>();
-    private Dictionary<ItemData, int> activeItemCooldowns = new Dictionary<ItemData, int>();
 
     [Header("Active Item")]
     public ItemData activeItem;
-    private int activeItemCooldown = 0;
 
     [Header("Health System")]
     [SerializeField] private int startingHealth = 3;
-    private HealthSystem healthSystem;
     public HealthSystem Health => healthSystem;
 
     [Header("Current Node")]
@@ -33,8 +30,22 @@ public class GameManager : Singleton<GameManager>
     public string mapScene = "Map";
 
     // Lista para salvar o estado dos nós do andar atual
+    private HealthSystem healthSystem;
     private List<MapNode> savedFloorNodes = new List<MapNode>();
+    private Dictionary<ItemData, int> activeItemCooldowns = new Dictionary<ItemData, int>();
+    private int activeItemCooldown = 0;
+    private ActiveItemUI activeItemUI;
 
+
+    private void Start()
+    {
+        activeItemUI = FindObjectOfType<ActiveItemUI>(true);
+        if(activeItemUI == null) 
+        {
+            Debug.LogWarning("ActiveItemUI não encontrado na cena");
+        }
+    }
+   
     protected override void Awake()
     {
         base.Awake();
@@ -62,6 +73,8 @@ public class GameManager : Singleton<GameManager>
         savedFloorNodes.Clear();
         ownedItems.Clear();
         purchasedUniqueItems.Clear();
+        activeItem = null;
+        activeItemCooldown = 0;
 
         healthSystem = new HealthSystem(startingHealth);
         healthSystem.OnDeath += OnPlayerDeath;
@@ -73,6 +86,8 @@ public class GameManager : Singleton<GameManager>
     public void EnterNode(MapNode node)
     {
         currentNode = node;
+        PlayerIcon playerIcon = FindObjectOfType<PlayerIcon>();
+        if (playerIcon != null) playerIcon.SetVisible(false);
 
         MapGenerator mapGen = FindObjectOfType<MapGenerator>();
         if (mapGen != null)
@@ -135,8 +150,16 @@ public class GameManager : Singleton<GameManager>
                     if (currentIndex >= 0 && currentIndex < savedFloorNodes.Count - 1)
                     {
                         savedFloorNodes[currentIndex].isVisited = true;
-                        savedFloorNodes[currentIndex + 1].isAvailable = true;
+                        MapNode nextNode = savedFloorNodes[currentIndex + 1];
+                        nextNode.isAvailable = true;
                         Debug.Log($"Liberou nó {currentIndex + 2}");
+
+                        // Move a câmera para o próximo nó
+                        MapGenerator mapGen = FindObjectOfType<MapGenerator>();
+                        if (mapGen != null)
+                        {
+                            mapGen.FocusOnNode(nextNode);
+                        }
                     }
                 }
                 ReduceActiveItemCooldown();
@@ -271,13 +294,12 @@ public class GameManager : Singleton<GameManager>
     //}
     public bool TryUseActiveItem()
     {
+        Debug.Log($"Tentando usar: cooldown atual = {activeItemCooldown}");
         if (activeItem != null && activeItemCooldown == 0)
         {
-            Debug.Log($"Usando item ativo: {activeItem.itemName}");
-            activeItem.ApplyEffect(); // O efeito específico será implementado em cada item
             activeItemCooldown = activeItem.cooldownNodes;
-
-            // Atualiza a UI para mostrar o cooldown
+            Debug.Log($"Usou! Novo cooldown = {activeItemCooldown}");
+            activeItem.ApplyEffect();
             UpdateActiveItemUI();
             return true;
         }
@@ -303,11 +325,10 @@ public class GameManager : Singleton<GameManager>
     }
     private void UpdateActiveItemUI()
     {
-        ActiveItemUI ui = FindObjectOfType<ActiveItemUI>();
-        if (ui != null)
-        {
-            ui.UpdateDisplay(activeItem, activeItemCooldown);
-        }
+       if(activeItemUI != null) 
+       {
+            activeItemUI.UpdateDisplay(activeItem, activeItemCooldown);
+       }
     }
     public bool IsItemPurchased(ItemData item) 
     {
