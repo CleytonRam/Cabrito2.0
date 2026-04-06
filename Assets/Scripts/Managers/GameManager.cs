@@ -17,6 +17,7 @@ public class GameManager : Singleton<GameManager>
 
     [Header("Active Item")]
     public ItemData activeItem;
+    public int activeItemCooldown = 0;
 
     [Header("Health System")]
     [SerializeField] private int startingHealth = 3;
@@ -33,7 +34,6 @@ public class GameManager : Singleton<GameManager>
     private HealthSystem healthSystem;
     private List<MapNode> savedFloorNodes = new List<MapNode>();
     private Dictionary<ItemData, int> activeItemCooldowns = new Dictionary<ItemData, int>();
-    private int activeItemCooldown = 0;
     private ActiveItemUI activeItemUI;
 
 
@@ -323,7 +323,7 @@ public class GameManager : Singleton<GameManager>
             UpdateActiveItemUI();
         }
     }
-    private void UpdateActiveItemUI()
+    public void UpdateActiveItemUI()
     {
        if(activeItemUI != null) 
        {
@@ -342,6 +342,35 @@ public class GameManager : Singleton<GameManager>
             purchasedUniqueItems.Add(item);
             Debug.Log($"Item único marcado como comprado: {item.itemName}");
         }
+    }
+    #endregion
+
+    #region EVENTS
+    public void OnEventCompleted()
+    {
+        if (savedFloorNodes != null && savedFloorNodes.Count > 0 && currentNode != null)
+        {
+            int currentIndex = -1;
+            for (int i = 0; i < savedFloorNodes.Count; i++)
+            {
+                if (savedFloorNodes[i].nodeType == currentNode.nodeType &&
+                    savedFloorNodes[i].position == currentNode.position)
+                {
+                    currentIndex = i;
+                    break;
+                }
+            }
+
+            if (currentIndex >= 0 && currentIndex < savedFloorNodes.Count - 1)
+            {
+                savedFloorNodes[currentIndex].isVisited = true;
+                MapNode nextNode = savedFloorNodes[currentIndex + 1];
+                nextNode.isAvailable = true;
+                Debug.Log($"Evento completado, liberou nó {currentIndex + 2}");
+            }
+        }
+
+        
     }
     #endregion
 }

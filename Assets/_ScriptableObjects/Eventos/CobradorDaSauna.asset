@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a91f882251c8b04cb4727d5d6976174, type: 3}
+  m_Name: CobradorDaSauna
+  m_EditorClassIdentifier: 
+  eventName: Cobrador da sauna
+  description: 'aooo bodao, os cara da sauna ta perguntando do ce, beijo seu chupao
+    de pica '
+  eventArt: {fileID: -7403500451915668029, guid: aacb6d6db50455b4980eef74c8343462, type: 3}
+  options:
+  - optionText: Entrar na sauna
+    consequence:
+      coinsChange: -20
+      healthChange: 3
+      maxHealthChange: 0
+      itemReward: {fileID: 0}
+      removeActiveItem: 0
+  - optionText: Beijo chupao de pica
+    consequence:
+      coinsChange: 0
+      healthChange: 0
+      maxHealthChange: 1
+      itemReward: {fileID: 0}
+      removeActiveItem: 0
+  - optionText: Tentar se esgueirar pela porta
+    consequence:
+      coinsChange: 0
+      healthChange: 3
+      maxHealthChange: 0
+      itemReward: {fileID: 0}
+      removeActiveItem: 1
