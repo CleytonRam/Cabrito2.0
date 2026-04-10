@@ -24,16 +24,13 @@ public class HealthUI : MonoBehaviour
 
     public void UpdateHearts(int currentHealth, int maxHealth)
     {
-        // Limpa corações antigos
         ClearHearts();
 
-        // Cria novos corações
         for (int i = 0; i < maxHealth; i++)
         {
             CreateNewHeart();
         }
 
-        // Atualiza sprites
         for (int i = 0; i < heartImages.Count; i++)
         {
             heartImages[i].sprite = i < currentHealth ? fullHeartSprite : emptyHeartSprite;

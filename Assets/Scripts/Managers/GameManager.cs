@@ -30,6 +30,8 @@ public class GameManager : Singleton<GameManager>
     public string menuScene = "Menu";
     public string mapScene = "Map";
 
+
+    public bool hasContratoSangue = false;
     // Lista para salvar o estado dos nós do andar atual
     private HealthSystem healthSystem;
     private List<MapNode> savedFloorNodes = new List<MapNode>();
@@ -75,6 +77,7 @@ public class GameManager : Singleton<GameManager>
         purchasedUniqueItems.Clear();
         activeItem = null;
         activeItemCooldown = 0;
+        hasContratoSangue = false;
 
         healthSystem = new HealthSystem(startingHealth);
         healthSystem.OnDeath += OnPlayerDeath;
@@ -125,9 +128,16 @@ public class GameManager : Singleton<GameManager>
     {
         if (won)
         {
+            int baseCoins = Random.Range(2, 12);
+
+            if (hasContratoSangue && currentNode != null && currentNode.nodeType != NodeType.Boss)
+            {
+                baseCoins *= 2;
+                Debug.Log($"Contrato de Sangue: Moedas dobradas! +{baseCoins}");
+            }
             coins += Random.Range(2, 12);
             Debug.Log($"Ganhou a rodada! Moedas: {coins}");
-
+            
             if (currentNode != null && currentNode.nodeType == NodeType.Boss)
             {
                 AdvanceToNextFloor();
@@ -154,7 +164,6 @@ public class GameManager : Singleton<GameManager>
                         nextNode.isAvailable = true;
                         Debug.Log($"Liberou nó {currentIndex + 2}");
 
-                        // Move a câmera para o próximo nó
                         MapGenerator mapGen = FindObjectOfType<MapGenerator>();
                         if (mapGen != null)
                         {
@@ -372,5 +381,7 @@ public class GameManager : Singleton<GameManager>
 
         
     }
+
+   
     #endregion
 }

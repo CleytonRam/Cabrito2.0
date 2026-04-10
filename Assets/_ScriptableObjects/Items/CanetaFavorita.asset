@@ -15,8 +15,8 @@ MonoBehaviour:
   itemName: Caneta Favorita
   description: 'Toda mordida '
   icon: {fileID: -8900572590507102834, guid: a464d0edcc64a254eb41d9a66637c066, type: 3}
-  price: 10
+  price: 15
   rarity: 0
-  isUnique: 0
+  isUnique: 1
   isActive: 0
   cooldownNodes: 2

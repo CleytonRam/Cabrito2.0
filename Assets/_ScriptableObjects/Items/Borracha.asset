@@ -17,6 +17,6 @@ MonoBehaviour:
   icon: {fileID: 2436738296648461087, guid: 725c52de7ccbf4c43943610e82126413, type: 3}
   price: 20
   rarity: 0
-  isUnique: 0
+  isUnique: 1
   isActive: 1
   cooldownNodes: 2

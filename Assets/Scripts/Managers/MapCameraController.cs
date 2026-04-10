@@ -19,12 +19,9 @@ public class MapCameraController : MonoBehaviour
     {
         if (target == null || container == null) return;
 
-        // Calcula a posição desejada do container para centralizar o target
-        // Queremos que o target fique no centro da tela
-        // Então o container deve se mover para que target.localPosition fique em (0,0) + offset
+       
         Vector3 desiredPosition = -target.localPosition + new Vector3(offset.x, offset.y, 0);
 
-        // Suaviza o movimento
         container.localPosition = Vector3.Lerp(container.localPosition, desiredPosition, smoothSpeed * Time.deltaTime);
     }
 

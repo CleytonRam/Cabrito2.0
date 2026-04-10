@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 327b613732467644a8f96eeac388c391, type: 3}
-  m_Name: Lupa
+  m_Script: {fileID: 11500000, guid: 413130e8c76cdfc48bab1e1b47ee24da, type: 3}
+  m_Name: Oraculo
   m_EditorClassIdentifier: 
-  itemName: Lupa magica
-  description: Olhe um pouco mais perto
-  icon: {fileID: -6915820643654098165, guid: 682107f4aacd89c4da914c1e1237a57f, type: 3}
-  price: 24
-  rarity: 1
+  itemName: Oraculo
+  description: Veja o futuro
+  icon: {fileID: -88133402546254603, guid: 7e5887bc7e3ee4c4ca14c1116449dec8, type: 3}
+  price: 30
+  rarity: 2
   isUnique: 1
   isActive: 0
   cooldownNodes: 2

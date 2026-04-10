@@ -15,7 +15,7 @@ namespace Ebac.Core.Singleton
             }
 
             Instance = this as T;
-            DontDestroyOnLoad(gameObject); // ADICIONE ESTA LINHA
+            DontDestroyOnLoad(gameObject); 
         }
 
         protected virtual void OnDestroy()

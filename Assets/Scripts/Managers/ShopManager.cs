@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 
 public class ShopManager : MonoBehaviour
 {
+    public static ShopManager Instance { get; private set; }
+
     [Header("Config")]
     public int itemSlots = 4;
 
@@ -21,6 +23,11 @@ public class ShopManager : MonoBehaviour
     [Range(0, 100)] public int rareChance = 10;
     [Range(0, 100)] public int legendaryChance = 5;
 
+    [Header("Purchase Popup")]
+    public GameObject purchasePopupPanel;
+    public TextMeshProUGUI popupMessageText;
+    public Button popupCloseButton;
+
     [Header("Slots Fixos")]
     public Transform[] slotPositions;
 
@@ -32,10 +39,9 @@ public class ShopManager : MonoBehaviour
     public TextMeshProUGUI coinsText;
     public Button backButton;
 
-    // Guarda os itens que estão na loja atual
     private List<ItemData> currentShopItems = new List<ItemData>();
-    // Guarda os slots GameObject para poder destruir
     private List<GameObject> currentSlots = new List<GameObject>();
+    private bool isPopupActive = false;
 
     private void Start()
     {
@@ -44,6 +50,13 @@ public class ShopManager : MonoBehaviour
 
         if (backButton != null)
             backButton.onClick.AddListener(OnBackButtonClicked);
+
+        if (purchasePopupPanel != null)
+            purchasePopupPanel.SetActive(false);
+
+        if (popupCloseButton != null)
+            popupCloseButton.onClick.AddListener(ClosePopup);
+
     }
 
     public void UpdateCoinsUI()
@@ -53,16 +66,22 @@ public class ShopManager : MonoBehaviour
             coinsText.text = $"Moedas: {GameManager.Instance.coins}";
         }
     }
-
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
     public void GenerateShop()
     {
-        // Limpa slots antigos
         foreach (var slot in currentSlots)
             if (slot != null) Destroy(slot);
         currentSlots.Clear();
         currentShopItems.Clear();
 
-        // Gera novos itens
         for (int i = 0; i < itemSlots; i++)
         {
             if (i >= slotPositions.Length) break;
@@ -72,7 +91,6 @@ public class ShopManager : MonoBehaviour
             {
                 currentShopItems.Add(selectedItem);
 
-                // Instancia o slot na posição fixa
                 GameObject slotGO = Instantiate(shopSlotPrefab, slotPositions[i].position, Quaternion.identity, slotsContainer);
                 slotGO.transform.position = slotPositions[i].position;
                 currentSlots.Add(slotGO);
@@ -87,7 +105,6 @@ public class ShopManager : MonoBehaviour
         int roll = Random.Range(0, 100);
         int cumulative = 0;
 
-        // Verifica se o item é único (não foi comprado antes)
         List<ItemData> availableCommons = GetAvailableItems(commonItems);
         List<ItemData> availableUncommons = GetAvailableItems(uncommonItems);
         List<ItemData> availableRares = GetAvailableItems(rareItems);
@@ -109,7 +126,6 @@ public class ShopManager : MonoBehaviour
         if (roll < cumulative && availableLegendaries.Count > 0)
             return availableLegendaries[Random.Range(0, availableLegendaries.Count)];
 
-        // Fallback: pega qualquer item disponível
         if (availableCommons.Count > 0) return availableCommons[0];
         if (availableUncommons.Count > 0) return availableUncommons[0];
         if (availableRares.Count > 0) return availableRares[0];
@@ -118,14 +134,12 @@ public class ShopManager : MonoBehaviour
         return null;
     }
 
-    // Filtra apenas os itens que ainda não foram comprados (se forem únicos)
     private List<ItemData> GetAvailableItems(List<ItemData> pool)
     {
         List<ItemData> available = new List<ItemData>();
 
         foreach (ItemData item in pool)
         {
-            // Se o item não for único, ou se for único mas ainda não foi comprado
             if (!item.isUnique || !GameManager.Instance.IsItemPurchased(item))
             {
                 available.Add(item);
@@ -154,29 +168,6 @@ public class ShopManager : MonoBehaviour
         if (priceText != null)
             priceText.text = item.price.ToString();
 
-        //Image background = slotGO.GetComponent<Image>();
-        //if (background != null)
-        //{
-        //    switch (item.rarity)
-        //    {
-        //        case ItemData.Rarity.Comum:
-        //            background.color = Color.white;
-        //            break;
-        //        case ItemData.Rarity.Incomum:
-        //            background.color = Color.blue;
-        //            break;
-        //        case ItemData.Rarity.Raro:
-        //            background.color = Color.magenta;
-        //            break;
-        //        case ItemData.Rarity.Lendario:
-        //            background.color = Color.yellow;
-        //            break;
-        //        case ItemData.Rarity.Maldito:
-        //            background.color = Color.red;
-        //            break;
-        //    }
-        //}
-
         if (buyButton != null)
         {
             buyButton.onClick.AddListener(() => BuyItem(item, slotGO));
@@ -189,31 +180,25 @@ public class ShopManager : MonoBehaviour
 
         if (GameManager.Instance.coins >= item.price)
         {
-            // Paga
             GameManager.Instance.coins -= item.price;
 
-            // Se for item único, marca como comprado
             if (item.isUnique)
             {
                 GameManager.Instance.MarkItemAsPurchased(item);
             }
 
-            // Adiciona item ao inventário
             GameManager.Instance.AddItem(item);
 
             Debug.Log($"Comprou: {item.itemName} (Raridade: {item.rarity})");
 
-            // REMOVE O SLOT DA PRATELEIRA
             Destroy(slot);
 
-            // Remove da lista de slots ativos
             currentSlots.Remove(slot);
 
-            // Remove da lista de itens da loja
             currentShopItems.Remove(item);
 
-            // Atualiza moedas na UI
             UpdateCoinsUI();
+            ShowPurchasePopup(item.itemName, item.description);
         }
         else
         {
@@ -221,17 +206,14 @@ public class ShopManager : MonoBehaviour
         }
     }
 
-    // Chamado quando clica no botão voltar
     public void OnBackButtonClicked()
     {
         if (GameManager.Instance != null && GameManager.Instance.currentNode != null)
         {
             MapNode shopNode = GameManager.Instance.currentNode;
 
-            // Marca o nó da loja como visitado
             shopNode.isVisited = true;
 
-            // Pega os nós do andar salvos no GameManager
             List<MapNode> floorNodes = GameManager.Instance.GetSavedFloorNodes();
             if (floorNodes != null)
             {
@@ -246,6 +228,34 @@ public class ShopManager : MonoBehaviour
         }
 
         ReturnToMap();
+    }
+
+    public void ShowPurchasePopup(string itemName, string itemDescription)
+    {
+        if (purchasePopupPanel == null) return;
+
+        popupMessageText.text = $"Você comprou:\n<color=yellow>{itemName}</color>\n{itemDescription}";
+        purchasePopupPanel.SetActive(true);
+        isPopupActive = true;
+
+        SetShopButtonsInteractable(false);
+    }
+    private void ClosePopup()
+    {
+        if (purchasePopupPanel != null)
+            purchasePopupPanel.SetActive(false);
+        isPopupActive = false;
+
+        SetShopButtonsInteractable(true);
+    }
+    private void SetShopButtonsInteractable(bool interactable)
+    {
+        foreach (var slot in currentSlots)
+        {
+            Button btn = slot.GetComponent<Button>();
+            if (btn != null) btn.interactable = interactable;
+        }
+        if (backButton != null) backButton.interactable = interactable;
     }
 
     public void ReturnToMap()

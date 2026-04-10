@@ -1269,6 +1269,7 @@ MonoBehaviour:
   ownedItems: []
   purchasedUniqueItems: []
   activeItem: {fileID: 0}
+  activeItemCooldown: 0
   startingHealth: 3
   currentNode:
     nodeType: 0

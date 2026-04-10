@@ -39,7 +39,6 @@ public class EventManager : MonoBehaviour
 
     void Start()
     {
-        // Configura o painel de resultado
         if (resultPanel != null)
         {
             resultPanel.SetActive(false);
@@ -50,7 +49,6 @@ public class EventManager : MonoBehaviour
             resultPanel.transform.localScale = Vector3.zero;
         }
 
-        // Escolhe um evento aleatório
         if (allEvents.Count > 0)
         {
             currentEvent = allEvents[Random.Range(0, allEvents.Count)];
@@ -61,7 +59,6 @@ public class EventManager : MonoBehaviour
             Debug.LogError("Nenhum evento configurado!");
         }
 
-        // Configura o botão continuar
         if (continueButton != null)
             continueButton.onClick.AddListener(FinishEvent);
     }
@@ -73,7 +70,6 @@ public class EventManager : MonoBehaviour
         if (artImage != null && eventData.eventArt != null)
             artImage.sprite = eventData.eventArt;
 
-        // Cria botões para cada opção
         foreach (var opt in eventData.options)
         {
             GameObject btnGO = Instantiate(optionButtonPrefab, optionsContainer);
@@ -90,7 +86,6 @@ public class EventManager : MonoBehaviour
 
     void ShowResult(Consequence cons)
     {
-        // Aplica os efeitos
         if (GameManager.Instance != null)
         {
             GameManager.Instance.coins += cons.coinsChange;
@@ -108,7 +103,6 @@ public class EventManager : MonoBehaviour
             }
         }
 
-        // Monta a mensagem de resultado
         string message = "";
         if (cons.coinsChange != 0)
             message += (cons.coinsChange > 0 ? $"+{cons.coinsChange} moedas" : $"{cons.coinsChange} moedas") + "\n";
@@ -126,16 +120,12 @@ public class EventManager : MonoBehaviour
 
         resultText.text = message;
 
-        // Mostra o painel com animação de entrada
         resultPanel.SetActive(true);
 
-        // Fade in
         resultCanvasGroup.DOFade(1f, fadeInDuration).SetEase(fadeInEase);
 
-        // Escala in
         resultPanel.transform.DOScale(1f, scaleInDuration).SetEase(scaleInEase);
 
-        // Desativa os botões de opção para não clicar de novo
         foreach (Transform child in optionsContainer)
         {
             Button btn = child.GetComponent<Button>();
@@ -145,14 +135,12 @@ public class EventManager : MonoBehaviour
 
     void FinishEvent()
     {
-        // Anima a saída
         Sequence fadeOut = DOTween.Sequence();
 
         fadeOut.Join(resultCanvasGroup.DOFade(0f, fadeOutDuration).SetEase(fadeOutEase));
         fadeOut.Join(resultPanel.transform.DOScale(0.8f, scaleOutDuration).SetEase(scaleOutEase));
 
         fadeOut.OnComplete(() => {
-            // Finaliza o evento
             if (GameManager.Instance != null)
             {
                 if (GameManager.Instance.currentNode != null)
@@ -160,7 +148,6 @@ public class EventManager : MonoBehaviour
                 GameManager.Instance.OnEventCompleted();
             }
 
-            // Volta ao mapa
             SceneManager.LoadScene(GameManager.Instance.mapScene);
         });
     }

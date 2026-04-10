@@ -15,6 +15,7 @@ public class Board : MonoBehaviour
     public Tile.State correctState;
     public Tile.State wrongSpotState;
     public Tile.State incorrectState;
+
     
 
     private Row[] rows;
@@ -222,5 +223,13 @@ public class Board : MonoBehaviour
             return rows[row].tiles[col].letter;
         }
         return '\0';
+    }
+
+    public void SetVisibleRows(int visibleRows)
+    {
+        for (int i = 0; i < rows.Length; i++)
+        {
+            rows[i].gameObject.SetActive(i < visibleRows);
+        }
     }
 }

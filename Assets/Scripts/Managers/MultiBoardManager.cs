@@ -1,5 +1,7 @@
 using NUnit.Framework;
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -17,11 +19,18 @@ public class MultiBoardManager : MonoBehaviour
     public GameObject changeMapButton;
     public GameObject backToMapButton;
 
+    [Header("Result Popup")]
+    public GameObject resultPopupPanel;           // Painel que escurece a tela
+    public TextMeshProUGUI popupMessageText;      // Texto da mensagem
+    public Button popupCloseButton;               // Botão "OK"
+
 
     private int currentRow = 0;
     private int currentCol = 0;
     private bool isGameActive = true;
     private bool usedActiveItemInThisNode = false;
+    private bool isPopupActive = false;
+
 
 
     private static readonly KeyCode[] SUPPORTED_KEYS = new KeyCode[]
@@ -54,7 +63,14 @@ public class MultiBoardManager : MonoBehaviour
 
         foreach(ItemData item in GameManager.Instance.ownedItems) 
         {
-            item.ApplyEffect();
+            if (item.isActive == false)
+            {
+                item.ApplyEffect();
+            }
+        }
+        foreach (Board board in boards)
+        {
+            board.SetVisibleRows(maxRows);
         }
 
 
@@ -69,7 +85,7 @@ public class MultiBoardManager : MonoBehaviour
 
     private void Update()
     {
-        if (!isGameActive) return;
+        if (!isGameActive || isPopupActive) return;
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             if (!usedActiveItemInThisNode && GameManager.Instance.TryUseActiveItem())
@@ -242,6 +258,34 @@ public class MultiBoardManager : MonoBehaviour
 
 
     #endregion
+
+
+    public void ShowPopup(string message)
+    {
+        if (resultPopupPanel == null) return;
+
+        // Configura mensagem
+        popupMessageText.text = message;
+
+        // Ativa o painel
+        resultPopupPanel.SetActive(true);
+        isPopupActive = true;
+
+        // Para o input do jogo (não digita nem submete enquanto o popup estiver aberto)
+        // O Update já vai ignorar se isPopupActive for true
+
+        // Adiciona listener ao botão (remove anterior para evitar múltiplos)
+        popupCloseButton.onClick.RemoveListener(ClosePopup);
+        popupCloseButton.onClick.AddListener(ClosePopup);
+    }
+
+
+    private void ClosePopup()
+    {
+        if (resultPopupPanel != null)
+            resultPopupPanel.SetActive(false);
+        isPopupActive = false;
+    }
 
     public void ChangeScene()
     {

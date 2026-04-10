@@ -24,17 +24,14 @@ public class MapGenerator : MonoBehaviour
 
     private void Start()
     {
-        // Verifica se temos um estado salvo
         List<MapNode> savedNodes = GameManager.Instance.GetSavedFloorNodes();
 
         if (savedNodes != null && savedNodes.Count > 0)
         {
-            // Restaura o estado salvo
             RestoreFloor(savedNodes);
         }
         else
         {
-            // Gera um novo andar
             GenerateFloor(GameManager.Instance.currentFloor);
         }
 
@@ -66,7 +63,6 @@ public class MapGenerator : MonoBehaviour
         nodeButtons.Clear();
         currentFloorNodes.Clear();
 
-        // 1. Gera os nós principais (sem eventos)
         List<MapNode> mainNodes = new List<MapNode>();
         bool hasShopThisFloor = (floorIndex >= 1);
         int shopPosition = hasShopThisFloor ? Random.Range(0, nodesPerFloor - 1) : -1;
@@ -85,12 +81,10 @@ public class MapGenerator : MonoBehaviour
             mainNodes.Add(node);
         }
 
-        // 2. Insere eventos entre os nós principais
         List<MapNode> finalNodes = new List<MapNode>();
         for (int i = 0; i < mainNodes.Count; i++)
         {
             finalNodes.Add(mainNodes[i]);
-            // Se não for o último e sorteio positivo, adiciona evento
             if (i < mainNodes.Count - 1 && Random.value < eventChance)
             {
                 MapNode eventNode = new MapNode(NodeType.Event, new Vector2(i + 0.5f, floorIndex));
@@ -98,7 +92,6 @@ public class MapGenerator : MonoBehaviour
             }
         }
 
-        // 3. Define disponibilidade: só o primeiro nó da lista disponível
         for (int i = 0; i < finalNodes.Count; i++)
         {
             finalNodes[i].isAvailable = (i == 0);
@@ -106,7 +99,6 @@ public class MapGenerator : MonoBehaviour
             currentFloorNodes.Add(finalNodes[i]);
         }
 
-        // 4. Cria os botões
         for (int i = 0; i < currentFloorNodes.Count; i++)
         {
             CreateNodeButton(currentFloorNodes[i], floorIndex, i);
@@ -118,14 +110,12 @@ public class MapGenerator : MonoBehaviour
 
     public void RestoreFloor(List<MapNode> savedNodes)
     {
-        // Limpa nós anteriores
         foreach (var btn in nodeButtons)
             if (btn != null) Destroy(btn.gameObject);
         nodeButtons.Clear();
 
         currentFloorNodes = savedNodes;
 
-        // Recria os botões com o estado salvo
         for (int i = 0; i < currentFloorNodes.Count; i++)
         {
             CreateNodeButton(currentFloorNodes[i], GameManager.Instance.currentFloor, i);
@@ -160,14 +150,12 @@ public class MapGenerator : MonoBehaviour
         {
             MapNodeButton targetButton = nodeToButton[node];
 
-            // Move o container para centralizar o nó
             MapCameraController camController = FindObjectOfType<MapCameraController>();
             if (camController != null)
             {
                 camController.SetTarget(targetButton.transform);
             }
 
-            // Move o ícone para o nó
             PlayerIcon playerIcon = FindObjectOfType<PlayerIcon>();
             if (playerIcon != null)
             {
@@ -180,7 +168,6 @@ public class MapGenerator : MonoBehaviour
     {
         Debug.Log("PositionIconOnCurrentNode chamado");
 
-        // 1. Procura o primeiro nó disponível e não visitado
         MapNode currentNode = null;
         foreach (var node in currentFloorNodes)
         {
@@ -192,7 +179,6 @@ public class MapGenerator : MonoBehaviour
             }
         }
 
-        // 2. Se não encontrou, pega o último visitado
         if (currentNode == null)
         {
             foreach (var node in currentFloorNodes)
@@ -226,7 +212,6 @@ public class MapGenerator : MonoBehaviour
             playerIcon.SetVisible(true);
             playerIcon.UpdateIcon();
 
-            // MOVE O CONTAINER (em vez da câmera)
             MapCameraController camController = FindObjectOfType<MapCameraController>();
             if (camController != null)
             {
@@ -240,18 +225,15 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    // Este método é chamado quando um nó é completado (via GameManager)
     public void OnNodeCompleted(MapNode completedNode)
     {
         int index = currentFloorNodes.IndexOf(completedNode);
 
-        // Se não for o último nó (boss), libera o próximo
         if (index >= 0 && index < currentFloorNodes.Count - 1)
         {
             MapNode nextNode = currentFloorNodes[index + 1];
             nextNode.isAvailable = true;
 
-            // Atualiza a aparência do botão do próximo nó
             foreach (var btn in nodeButtons)
             {
                 if (btn.node == nextNode)

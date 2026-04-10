@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 327b613732467644a8f96eeac388c391, type: 3}
-  m_Name: Lupa
+  m_Script: {fileID: 11500000, guid: 318f0568d1be25746905c9a5a41452f6, type: 3}
+  m_Name: RoletaDeVogais
   m_EditorClassIdentifier: 
-  itemName: Lupa magica
-  description: Olhe um pouco mais perto
-  icon: {fileID: -6915820643654098165, guid: 682107f4aacd89c4da914c1e1237a57f, type: 3}
-  price: 24
-  rarity: 1
+  itemName: Roleta de vogais
+  description: Teste a sorte
+  icon: {fileID: -5216765622527067519, guid: c214e9f8dd180794494407688380437e, type: 3}
+  price: 32
+  rarity: 2
   isUnique: 1
-  isActive: 0
-  cooldownNodes: 2
+  isActive: 1
+  cooldownNodes: 4

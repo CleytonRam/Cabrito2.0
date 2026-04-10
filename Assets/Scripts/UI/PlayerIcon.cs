@@ -38,7 +38,6 @@ public class PlayerIcon : MonoBehaviour
         }
     }
 
-    // Coloca o ícone sobre um nó (no mapa)
     public void AttachToNode(Transform nodeTransform)
     {
         transform.SetParent(nodeTransform);

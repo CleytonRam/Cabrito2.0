@@ -10,31 +10,31 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4a91f882251c8b04cb4727d5d6976174, type: 3}
-  m_Name: CobradorDaSauna
+  m_Name: CobradorDaSaunaAlt
   m_EditorClassIdentifier: 
   eventName: Cobrador da sauna
-  description: "Aoo Bode, t\xE3o perguntando de voc\xEA aqui na sauna, vai dar uma
-    entrada hoje seu chupao de pica?"
+  description: Aooo Caloteiro, hoje ce vai ter que pagar o que ta devendo anda esvazia
+    os borso
   eventArt: {fileID: -7403500451915668029, guid: aacb6d6db50455b4980eef74c8343462, type: 3}
   options:
-  - optionText: Entrar na sauna
+  - optionText: Pagar
     consequence:
       coinsChange: -20
-      healthChange: 3
+      healthChange: 0
       maxHealthChange: 0
       itemReward: {fileID: 0}
       removeActiveItem: 0
-  - optionText: "Hoje n\xE3o"
+  - optionText: '"Pagar" '
     consequence:
       coinsChange: 0
       healthChange: 0
-      maxHealthChange: 1
+      maxHealthChange: -2
       itemReward: {fileID: 0}
       removeActiveItem: 0
-  - optionText: Tentar passar sem pagar
+  - optionText: "Fingir que n\xE3o \xE9 com voce"
     consequence:
       coinsChange: 0
-      healthChange: 3
+      healthChange: 0
       maxHealthChange: 0
       itemReward: {fileID: 0}
-      removeActiveItem: 1
+      removeActiveItem: 0
