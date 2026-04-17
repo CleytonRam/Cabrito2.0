@@ -25,11 +25,12 @@ public class MultiBoardManager : MonoBehaviour
     public Button popupCloseButton;               // Botão "OK"
 
 
-    private int currentRow = 0;
+    public int currentRow = 0;
     private int currentCol = 0;
     private bool isGameActive = true;
     private bool usedActiveItemInThisNode = false;
     private bool isPopupActive = false;
+    private bool cursorMovedToFilledTile = false;
 
 
 
@@ -76,8 +77,12 @@ public class MultiBoardManager : MonoBehaviour
 
         currentRow = 0;
         currentCol = 0;
+        UpdateCursorHighlight();
         isGameActive = true;
         usedActiveItemInThisNode = false;
+        cursorMovedToFilledTile = false;
+        VirtualKeyboardManager keyboard = FindObjectOfType<VirtualKeyboardManager>();
+        if (keyboard != null) keyboard.ResetKeyboardToDefault();
 
         if (invalidWordText) invalidWordText.SetActive(false);
         if (changeMapButton) changeMapButton.SetActive(false);
@@ -120,8 +125,9 @@ public class MultiBoardManager : MonoBehaviour
     }
 
     #region Letter handleling
-    private void HandleLetter(char letter)
+    public void HandleLetter(char letter)
     {
+        cursorMovedToFilledTile = false;
         if (invalidWordText) invalidWordText.SetActive(false);
 
         foreach (Board board in boards)
@@ -132,13 +138,25 @@ public class MultiBoardManager : MonoBehaviour
             }
         }
         currentCol++;
+        UpdateCursorHighlight();
     }
 
     private void HandleBackspace()
     {
         if (invalidWordText) invalidWordText.SetActive(false);
 
-        if (currentCol > 0)
+        if (cursorMovedToFilledTile)
+        {
+            foreach (Board board in boards)
+            {
+                if (!board.HasWon)
+                {
+                    board.SetLetter(currentRow, currentCol, '\0');
+                }
+            }
+            cursorMovedToFilledTile = false;
+        }
+        else if (currentCol > 0)
         {
             currentCol--;
             foreach (Board board in boards)
@@ -149,6 +167,8 @@ public class MultiBoardManager : MonoBehaviour
                 }
             }
         }
+
+        UpdateCursorHighlight();
     }
 
     private void HandleSubmit()
@@ -181,6 +201,8 @@ public class MultiBoardManager : MonoBehaviour
                 board.SubmitRow(currentRow);
             }
         }
+        VirtualKeyboardManager keyboard = FindObjectOfType<VirtualKeyboardManager>();
+        if (keyboard != null) keyboard.UpdateKeyboardFromBoards();
 
         bool allWon = true;
         foreach (Board board in boards)
@@ -208,6 +230,8 @@ public class MultiBoardManager : MonoBehaviour
 
         currentRow++;
         currentCol = 0;
+        cursorMovedToFilledTile = false;
+        UpdateCursorHighlight();
 
         if (currentRow >= maxRows)
         {
@@ -301,6 +325,38 @@ public class MultiBoardManager : MonoBehaviour
         else
         {
             SceneManager.LoadScene(nextScene);
+        }
+    }
+    public void MoveCursorToTile(Tile tile)
+    {
+        if (!isGameActive || isPopupActive) return;
+
+        if (tile.rowIndex == currentRow)
+        {
+            currentCol = tile.colIndex;
+
+            cursorMovedToFilledTile = (tile.letter != '\0');
+
+            UpdateCursorHighlight();
+            Debug.Log($"Cursor movido para linha {currentRow}, coluna {currentCol}");
+        }
+    }
+
+    private void UpdateCursorHighlight()
+    {
+        foreach (Board board in boards)
+        {
+            if (board.HasWon) continue;
+
+            Row currentRowObj = board.GetRow(currentRow);
+            if (currentRowObj == null) continue;
+
+            Tile[] tiles = currentRowObj.GetComponentsInChildren<Tile>();
+
+            for (int i = 0; i < tiles.Length; i++)
+            {
+                tiles[i].SetHighlight(i == currentCol);
+            }
         }
     }
 }
