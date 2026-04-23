@@ -14,17 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   eventName: Cobrador da sauna
   description: "Aoo Bode, t\xE3o perguntando de voc\xEA aqui na sauna, vai dar uma
-    entrada hoje seu chupao de pica?"
+    entrada hoje seu chupao de pica? os rapazes estao com saudade,m todo mundo perguntando
+    d'\xF4ce"
   eventArt: {fileID: -7403500451915668029, guid: aacb6d6db50455b4980eef74c8343462, type: 3}
   options:
-  - optionText: Entrar na sauna
+  - optionText: Entrar na sauna com os rapazes
     consequence:
       coinsChange: -20
       healthChange: 3
       maxHealthChange: 0
       itemReward: {fileID: 0}
       removeActiveItem: 0
-  - optionText: "Hoje n\xE3o"
+  - optionText: "S\xF3 se for pra te dar um beijo.."
     consequence:
       coinsChange: 0
       healthChange: 0

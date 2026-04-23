@@ -83,6 +83,9 @@ public class GameManager : Singleton<GameManager>
         healthSystem.OnDeath += OnPlayerDeath;
         healthSystem.OnHealthChanged += OnHealthChanged;
 
+        LetterStateManager letterState = GetComponent<LetterStateManager>();
+        if (letterState != null) letterState.ResetLetterStates();
+
         SceneManager.LoadScene(mapScene);
     }
 

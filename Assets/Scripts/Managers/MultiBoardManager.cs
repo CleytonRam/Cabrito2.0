@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -20,9 +20,13 @@ public class MultiBoardManager : MonoBehaviour
     public GameObject backToMapButton;
 
     [Header("Result Popup")]
-    public GameObject resultPopupPanel;           // Painel que escurece a tela
-    public TextMeshProUGUI popupMessageText;      // Texto da mensagem
-    public Button popupCloseButton;               // Bot�o "OK"
+    public GameObject resultPopupPanel;           
+    public TextMeshProUGUI popupMessageText;      
+    public Button popupCloseButton;
+
+    [Header("Game Over Panel")]
+    public GameObject gameOverPanel;
+    public TextMeshProUGUI gameOverMessage;
 
 
     public int currentRow = 0;
@@ -91,25 +95,22 @@ public class MultiBoardManager : MonoBehaviour
     private void Update()
     {
         if (!isGameActive || isPopupActive) return;
-        if (Input.GetKeyDown(KeyCode.Tab))
+
+        // Primeiro, verifica se Enter foi pressionado
+        if (Input.GetKeyDown(KeyCode.Return))
         {
-            if (!usedActiveItemInThisNode && GameManager.Instance.TryUseActiveItem())
-            {
-                usedActiveItemInThisNode = true;
-            }
+            HandleSubmit();
+            return;
         }
 
+        // Depois, processa backspace e letras
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
             HandleBackspace();
         }
-
         else if (currentCol >= wordLength)
         {
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                HandleSubmit();
-            }
+            // não faz nada (ou poderia ter alguma lógica, mas não é necessário)
         }
         else
         {
@@ -127,6 +128,7 @@ public class MultiBoardManager : MonoBehaviour
     #region Letter handleling
     public void HandleLetter(char letter)
     {
+        Debug.Log($"=== HANDLE LETTER: letra='{letter}', currentRow={currentRow}, currentCol={currentCol} (antes)");
         cursorMovedToFilledTile = false;
         if (invalidWordText) invalidWordText.SetActive(false);
 
@@ -138,15 +140,18 @@ public class MultiBoardManager : MonoBehaviour
             }
         }
         currentCol++;
+        Debug.Log($"=== HANDLE LETTER: currentCol agora é {currentCol} (depois)");
         UpdateCursorHighlight();
     }
 
     private void HandleBackspace()
     {
+        Debug.Log($"=== BACKSPACE: currentRow={currentRow}, currentCol={currentCol} (antes), cursorMovedToFilledTile={cursorMovedToFilledTile}");
         if (invalidWordText) invalidWordText.SetActive(false);
 
         if (cursorMovedToFilledTile)
         {
+            Debug.Log("Caso 1: Apagando na posição atual");
             foreach (Board board in boards)
             {
                 if (!board.HasWon)
@@ -158,6 +163,7 @@ public class MultiBoardManager : MonoBehaviour
         }
         else if (currentCol > 0)
         {
+            Debug.Log("Caso 2: Apagando letra anterior");
             currentCol--;
             foreach (Board board in boards)
             {
@@ -167,7 +173,7 @@ public class MultiBoardManager : MonoBehaviour
                 }
             }
         }
-
+        Debug.Log($"=== BACKSPACE: currentCol agora é {currentCol} (depois)");
         UpdateCursorHighlight();
     }
 
@@ -182,10 +188,29 @@ public class MultiBoardManager : MonoBehaviour
                 break;
             }
         }
-
         if (activeBoard == null) return;
 
+        // Verifica se todas as posições da linha atual têm letras
+        bool allFilled = true;
+        for (int i = 0; i < wordLength; i++)
+        {
+            Tile tile = activeBoard.GetTileAt(currentRow, i);
+            if (tile == null || tile.letter == '\0')
+            {
+                allFilled = false;
+                break;
+            }
+        }
+
+        if (!allFilled)
+        {
+            if (invalidWordText) invalidWordText.SetActive(true);
+            return;
+        }
+
+        // Se chegou aqui, a palavra está completa
         string attempt = activeBoard.GetRowWord(currentRow);
+        Debug.Log($"Submit: tentativa='{attempt}'");
 
         if (!activeBoard.IsValidWord(attempt))
         {
@@ -194,6 +219,7 @@ public class MultiBoardManager : MonoBehaviour
         }
         if (invalidWordText) invalidWordText.SetActive(false);
 
+        // Submeter a linha em todos os boards ativos
         foreach (Board board in boards)
         {
             if (!board.HasWon)
@@ -201,9 +227,12 @@ public class MultiBoardManager : MonoBehaviour
                 board.SubmitRow(currentRow);
             }
         }
+
+        // Atualiza teclado
         VirtualKeyboardManager keyboard = FindObjectOfType<VirtualKeyboardManager>();
         if (keyboard != null) keyboard.UpdateKeyboardFromBoards();
 
+        // Verifica vitória
         bool allWon = true;
         foreach (Board board in boards)
         {
@@ -216,23 +245,21 @@ public class MultiBoardManager : MonoBehaviour
 
         if (allWon)
         {
-            Debug.Log("VITORIA TODAS DESCOBERTAS");
+            Debug.Log("VITORIA");
             isGameActive = false;
             changeMapButton.SetActive(true);
             backToMapButton.SetActive(true);
-
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.OnNodeComplete(true);
-            }
+            if (GameManager.Instance != null) GameManager.Instance.OnNodeComplete(true);
             return;
         }
 
+        // Avança para a próxima linha
         currentRow++;
         currentCol = 0;
         cursorMovedToFilledTile = false;
         UpdateCursorHighlight();
 
+        // Verifica derrota
         if (currentRow >= maxRows)
         {
             bool anyLost = false;
@@ -242,15 +269,11 @@ public class MultiBoardManager : MonoBehaviour
             }
             if (anyLost)
             {
-                Debug.Log("DERROTA SEU BURRAO");
+                Debug.Log("DERROTA");
                 isGameActive = false;
                 changeMapButton.SetActive(true);
                 backToMapButton.SetActive(true);
-
-                if (GameManager.Instance != null)
-                {
-                    GameManager.Instance.OnNodeComplete(false);
-                }
+                ShowGameOverPanel();
             }
         }
     }
@@ -258,7 +281,7 @@ public class MultiBoardManager : MonoBehaviour
 
 
     #region Item things
-    
+
     public void UndoLastAttempt() 
     {
         if(currentRow <= 0) 
@@ -277,7 +300,7 @@ public class MultiBoardManager : MonoBehaviour
                 board.ClearRow(currentRow);
             }
         }
-        Debug.Log($"�ltima tentativa (linha {currentRow + 1}) apagada dos boards que n�o venceram!");
+        Debug.Log($"Última tentativa (linha {currentRow + 1}) apagada dos boards que não venceram!");
     }
 
 
@@ -295,10 +318,10 @@ public class MultiBoardManager : MonoBehaviour
         resultPopupPanel.SetActive(true);
         isPopupActive = true;
 
-        // Para o input do jogo (n�o digita nem submete enquanto o popup estiver aberto)
-        // O Update j� vai ignorar se isPopupActive for true
+        // Para o input do jogo (não digita nem submete enquanto o popup estiver aberto)
+        // O Update já vai ignorar se isPopupActive for true
 
-        // Adiciona listener ao bot�o (remove anterior para evitar m�ltiplos)
+        // Adiciona listener ao botão (remove anterior para evitar múltiplos)
         popupCloseButton.onClick.RemoveListener(ClosePopup);
         popupCloseButton.onClick.AddListener(ClosePopup);
     }
@@ -311,6 +334,30 @@ public class MultiBoardManager : MonoBehaviour
         isPopupActive = false;
     }
 
+    public void ShowGameOverPanel() 
+    {
+        if (gameOverPanel == null) return;
+        string message = "Perdeu fi, ";
+
+        if (boards.Count == 1)
+        {
+            message += $"a palavra secreta era: {boards[0].SecretWord.ToUpper()}";
+        }
+        else 
+        {
+            message += "as palavras secretas eram: ";
+            for (int i = 0; i < boards.Count; i++) 
+            {
+                message += boards[i].SecretWord.ToUpper();
+                if (i < boards.Count - 1) message += ", ";
+            }
+        }
+
+        gameOverMessage.text = message;
+        gameOverPanel.SetActive(true);
+    }
+
+
     public void ChangeScene()
     {
         SceneManager.LoadScene(nextScene);
@@ -318,7 +365,7 @@ public class MultiBoardManager : MonoBehaviour
 
     public void ReturnToMap()
     {
-        if (GameManager.Instance != null) // se existe inst�ncia
+        if (GameManager.Instance != null) // se existe instância
         {
             SceneManager.LoadScene(GameManager.Instance.mapScene);
         }
@@ -327,18 +374,29 @@ public class MultiBoardManager : MonoBehaviour
             SceneManager.LoadScene(nextScene);
         }
     }
+    public void ReturnToMapAfterLoss()
+    {
+        // Aplica a penalidade (perder vida, etc.)
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnNodeComplete(false);
+
+        // Depois carrega o mapa
+        if (GameManager.Instance != null)
+            SceneManager.LoadScene(GameManager.Instance.mapScene);
+        else
+            SceneManager.LoadScene(nextScene);
+    }
     public void MoveCursorToTile(Tile tile)
     {
+        Debug.Log($"=== MOVE CURSOR: tile.row={tile.rowIndex}, tile.col={tile.colIndex}, letter='{tile.letter}'");
         if (!isGameActive || isPopupActive) return;
 
         if (tile.rowIndex == currentRow)
         {
             currentCol = tile.colIndex;
-
             cursorMovedToFilledTile = (tile.letter != '\0');
-
+            Debug.Log($"Cursor movido para coluna {currentCol}, cursorMovedToFilledTile={cursorMovedToFilledTile}");
             UpdateCursorHighlight();
-            Debug.Log($"Cursor movido para linha {currentRow}, coluna {currentCol}");
         }
     }
 

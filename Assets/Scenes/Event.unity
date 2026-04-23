@@ -963,6 +963,8 @@ MonoBehaviour:
   scaleOutEase: 26
   allEvents:
   - {fileID: 11400000, guid: beeb0ba122b72414cbba66f8f6c0452b, type: 2}
+  - {fileID: 11400000, guid: a571d3e3c469f254eb920d61ed3b4da9, type: 2}
+  - {fileID: 11400000, guid: 0b2337a5f6495ea4da57459a11c2ba45, type: 2}
 --- !u!4 &1411756259
 Transform:
   m_ObjectHideFlags: 0

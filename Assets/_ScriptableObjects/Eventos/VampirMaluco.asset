@@ -10,30 +10,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4a91f882251c8b04cb4727d5d6976174, type: 3}
-  m_Name: CobradorDaSaunaAlt
+  m_Name: VampirMaluco
   m_EditorClassIdentifier: 
-  eventName: Cobrador da sauna
-  description: Aooo Caloteiro, hoje ce vai ter que pagar o que ta devendo anda esvazia
-    os borso
-  eventArt: {fileID: -7403500451915668029, guid: aacb6d6db50455b4980eef74c8343462, type: 3}
+  eventName: Vampir
+  description: "Oi amigo, sera que voc\xEA pode abrir sua porta porfavor to morrendo
+    de fome..."
+  eventArt: {fileID: 749688992821508225, guid: 1c3b99e86a69d104f9e18d872650f871, type: 3}
   options:
-  - optionText: Pagar
+  - optionText: Abrir porta
     consequence:
-      coinsChange: -20
+      coinsChange: 0
       healthChange: 0
+      maxHealthChange: -1
+      itemReward: {fileID: 0}
+      removeActiveItem: 0
+  - optionText: "Vai entrar n\xE3o z\xE9"
+    consequence:
+      coinsChange: 0
+      healthChange: 1
       maxHealthChange: 0
       itemReward: {fileID: 0}
       removeActiveItem: 0
-  - optionText: 'Pagar no halls preto '
+  - optionText: Chamar os cara
     consequence:
-      coinsChange: 0
-      healthChange: 0
-      maxHealthChange: -2
-      itemReward: {fileID: 0}
-      removeActiveItem: 0
-  - optionText: "Fingir que n\xE3o \xE9 com voce"
-    consequence:
-      coinsChange: 0
+      coinsChange: -10
       healthChange: 0
       maxHealthChange: 0
       itemReward: {fileID: 0}
